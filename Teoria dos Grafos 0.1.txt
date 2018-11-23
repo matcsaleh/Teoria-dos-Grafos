@@ -16,7 +16,7 @@ typedef struct{
       int q[MAXVERTICES];
 	  int d[MAXVERTICES];
 	  int f[MAXVERTICES];
-	
+	  int comp; //componentes
 }TGrafo;
 typedef struct{
 	
@@ -31,11 +31,7 @@ void inicializa(TGrafo *grafo)
      grafo->e = 0;
      grafo->ultimo = 0;
     
-	 for(i=0;i<grafo->n;i++)// seta cor branco e predecessor nill
-{
-		grafo->pi[i] == 0;
-		grafo->cor[i] == 0;
-}
+
 }
 
 void insereVertice (TGrafo *grafo)
@@ -81,18 +77,21 @@ int i,j;
 	{
 		for(j=0;j<n;j++)
 		{
-			if(rand()%100 > 50)
-			{
-				grafo->MAdj[i][j] = 1;
-				grafo->MAdj[j][i] = 1;
-		    }
-			else
-			{
-				grafo->MAdj[i][j] = 0;
-				grafo->MAdj[j][i] = 0;	
-			}
+			if(i!=j){// se o vertice não for igual ele seta valores aleatorios na matriz
+			
+				if(rand()%100 > 50)
+				{
+					grafo->MAdj[i][j] = 1;
+					grafo->MAdj[j][i] = 1;
+		    	}
+				else
+				{
+					grafo->MAdj[i][j] = 0;
+					grafo->MAdj[j][i] = 0;	
+				}
 			
 			grafo->e++;
+		}
 		}
 	}
 	
@@ -139,6 +138,7 @@ int euleriano(TGrafo grafo)
 
 int grafoCompleto(TGrafo grafo)
 {
+	
 	int i,j;
 	int aux = 0;
 	for(i=0;i<grafo.n;i++){
@@ -191,40 +191,63 @@ int i,j,aux = 0;
 	}
 return 0;
 }
-void buscaProfundidade(TGrafo grafo )
+void buscaProfundidade(TGrafo grafo)
 {
-int i=0;
+int i;
 int time = 0;
-	visitar(&grafo,i, time);		
-	
-	
 
 
-	for(i=1;i<grafo.n;i++)
+	for(i=0;i<=grafo.n;i++)
 	{
-		printf("F:%i ,T:%i \n",grafo.f[i],grafo.pi[i]);	
-	}
-	getch();
+		if(grafo.cor != 1)
+		{
+			printf("Chegou aqui1");
+			getch();
+			grafo.comp++;
+			visit(&grafo,i,&time);
+		}
+    }
+
 }
-void visitar(TGrafo *grafo, int vertice, int time)
+void visit(TGrafo *grafo, int vertice, int *time)
 {
+	printf("Chegou aqui2");
+	getch();
 	int i;
 	grafo->cor[vertice] = 1;
-	time ++;
-	grafo->d[vertice] = time; 
-	for(i=0;i<grafo->n;i++)
+	*time++;
+	grafo->d[vertice] = *time; 
+	
+	for(i=0;i<=grafo->n;i++)
 	{
-		if(grafo->MAdj[vertice][i] && grafo->cor[vertice] != 1)
+		//printf("chegou aqui3");
+		if(grafo->MAdj[vertice][i] == 1 && grafo->cor[vertice] != 1)
 		{
-			visitar(grafo,i,time);
+			printf("chegou aqui4");
+			getch();
+			visit(grafo,i,time);
 		}	
-		grafo->f[vertice] = time;
-		time ++;
 		
-	}	
+		
+	}
+	grafo->f[vertice] = *time;
+	*time++;	
+	
+}
+void iniciarBuscas(TGrafo *grafo)
+{
+int i;
+ 	for(i=0;i<grafo->n;i++)// seta cor branco e predecessor nill
+{
+		grafo->pi[i] = 0;
+		grafo->cor[i] = 0;
+		grafo->f[i] = 0;
+		grafo->d[i]= 0;
+		grafo->f[i]= 0;
 	
 }
 	
+}	
 
 int main(int argc, char *argv[])
 {
@@ -334,9 +357,23 @@ int main(int argc, char *argv[])
  }
  if(op == 9)
  {
+	int i;
+
+	iniciarBuscas(&grafo);
  	buscaProfundidade(grafo);
+ 	
+ 		for(i=0;i<grafo.n;i++)
+	{
+			printf("Vertice[%d],Finaliza:%i ,Fila:%i \n",i,grafo.f[i],grafo.d[i]);	
+	}
+	getch();
  }
- 
+ if(op == 10)
+ {
+ 	buscaProfundidade(grafo);
+ 	printf("\n\n%d, Componentes",grafo.comp);
+ 	getch();
+ }
  } while(op!=0); 
 
 
